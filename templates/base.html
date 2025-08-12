@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}OrderKanto - Street Food{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      background: url("{% static 'images/bg-photo.jpg' %}") no-repeat center center fixed;
+      background-size: cover;
+    }
+    header {
+      background: rgba(255, 255, 255, 0.85);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #ddd;
+      box-shadow: 0 1px 3px rgb(0 0 0 / 0.05);
+    }
+    header h1 a {
+      font-size: 1.2rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: #333;
+    }
+    nav a {
+      margin-left: 1rem;
+      text-decoration: none;
+      color: #666;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    nav a:hover,
+    nav a.active {
+      color: #4a8a85;
+    }
+    main {
+      min-height: calc(100vh - 64px);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+      padding: 1rem;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+      text-align: center;
+    }
+    button {
+      background: #4a8a85;
+      color: white;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.2s;
+    }
+    button:hover {
+      background: #3a6e6b;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><a href="{% url 'home' %}">Order Kanto</a></h1>
+    <nav>
+      <a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a>
+      <a href="{% url 'menu:menu' %}" class="{% if request.resolver_match.url_name == 'menu' %}active{% endif %}">Menu</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'customers:cart' %}" class="{% if request.resolver_match.url_name == 'cart' %}active{% endif %}">Cart</a>
+        <a href="{% url 'customers:order_history' %}" class="{% if request.resolver_match.url_name == 'order_history' %}active{% endif %}">Orders</a>
+        <a href="{% url 'customers:customer_logout' %}">Logout</a>
+      {% else %}
+        <a href="{% url 'customers:customer_login' %}" class="{% if request.resolver_match.url_name == 'customer_login' %}active{% endif %}">Login</a>
+        <a href="{% url 'customers:register' %}" class="{% if request.resolver_match.url_name == 'register' %}active{% endif %}">Register</a>
+      {% endif %}
+      {% if user.is_staff %}
+        <a href="{% url 'admin_dashboard' %}" class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">Admin</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main>
+    {% block content %}
+    {% endblock %}
+  </main>
+</body>
+</html>

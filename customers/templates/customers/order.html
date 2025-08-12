@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+  <h2>Your Order</h2>
+  {% for item in cart_items %}
+  <div>{{ item.menu_item.name }} - ₱{{ item.menu_item.price }} x {{ item.quantity }}</div>
+  {% empty %}
+  <p>Your cart is empty.</p>
+  {% endfor %}
+  <div class="order-total">Total: ₱{{ total_price }}</div>
+  <button>Place Order</button>
+</div>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Checkout</h1>
+    <p class="mt-2 text-gray-600">Complete your order by providing delivery and payment information</p>
+  </div>
+
+  {% if messages %}
+  <div class="messages mb-6">
+    {% for message in messages %}
+    <div class="p-4 mb-4 text-sm rounded-lg {% if message.tags == 'error' %}bg-red-100 text-red-700{% elif message.tags == 'success' %}bg-green-100 text-green-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Order Summary -->
+    <div class="bg-white shadow sm:rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Order Summary</h3>
+        
+        <div class="space-y-3">
+          {% for item in order.items.all %}
+          <div class="flex justify-between items-center py-2 border-b border-gray-100">
+            <div class="flex items-center">
+              <span class="text-sm font-medium text-gray-900">{{ item.quantity }}x</span>
+              <span class="ml-2 text-sm text-gray-700">{{ item.menu_item.name }}</span>
+            </div>
+            <span class="text-sm font-medium text-gray-900">₱{{ item.total_price }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        
+        <div class="mt-4 pt-4 border-t border-gray-200">
+          <div class="flex justify-between items-center">
+            <span class="text-lg font-medium text-gray-900">Total</span>
+            <span class="text-2xl font-bold text-gray-900">₱{{ order.total_price }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Checkout Form -->
+    <div class="bg-white shadow sm:rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Delivery & Payment Details</h3>
+        
+        <form method="post" class="space-y-6">
+          {% csrf_token %}
+          
+          <div>
+            <label for="{{ form.delivery_address.id_for_label }}" class="block text-sm font-medium text-gray-700">
+              Delivery Address
+            </label>
+            {{ form.delivery_address }}
+            {% if form.delivery_address.errors %}
+            <div class="text-red-600 text-sm mt-1">{{ form.delivery_address.errors.0 }}</div>
+            {% endif %}
+            {% if form.delivery_address.help_text %}
+            <p class="text-gray-500 text-sm mt-1">{{ form.delivery_address.help_text }}</p>
+            {% endif %}
+          </div>
+
+          <div>
+            <label for="{{ form.payment_method.id_for_label }}" class="block text-sm font-medium text-gray-700">
+              Payment Method
+            </label>
+            {{ form.payment_method }}
+            {% if form.payment_method.errors %}
+            <div class="text-red-600 text-sm mt-1">{{ form.payment_method.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div>
+            <label for="{{ form.special_instructions.id_for_label }}" class="block text-sm font-medium text-gray-700">
+              Special Instructions (Optional)
+            </label>
+            {{ form.special_instructions }}
+            {% if form.special_instructions.errors %}
+            <div class="text-red-600 text-sm mt-1">{{ form.special_instructions.errors.0 }}</div>
+            {% endif %}
+            {% if form.special_instructions.help_text %}
+            <p class="text-gray-500 text-sm mt-1">{{ form.special_instructions.help_text }}</p>
+            {% endif %}
+          </div>
+
+          <div class="pt-4">
+            <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              Confirm Order
+            </button>
+          </div>
+        </form>
+        
+        <div class="mt-4 text-center">
+          <a href="{% url 'customers:cart' %}" class="text-indigo-600 hover:text-indigo-500 text-sm">
+            ← Back to Cart
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  input, textarea, select {
+    @apply appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm;
+  }
+</style>
+{% endblock %} 

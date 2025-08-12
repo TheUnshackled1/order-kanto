@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+  <h2>Sales Report</h2>
+  <p>Total Sales: ₱{{ total_sales }}</p>
+  
+  <h3>Sales by Item</h3>
+  <ul>
+    {% for item in sales_by_item %}
+    <li>{{ item.name }}: ₱{{ item.total_revenue }}</li>
+    {% endfor %}
+  </ul>
+  
+  <h3>User Order History</h3>
+  <ul>
+    {% for record in order_history %}
+      <li>
+        {{ record.user.username }} — Orders: {{ record.order_count }}
+      </li>
+    {% empty %}
+      <li>No order history found.</li>
+    {% endfor %}
+  </ul>
+
+  <button onclick="window.history.back()" class="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+    Go Back
+  </button>
+</div>
+{% endblock %}

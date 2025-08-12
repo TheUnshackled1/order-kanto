@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}OrderKanto - Street Food{% endblock %}
+
+{% block content %}
+  <div 
+    class="min-h-screen bg-cover bg-center flex items-center justify-center"
+    style="background-image: url('{% static "images/home-bg.png" %}');"
+  >
+    <div class="bg-black/50 p-10 rounded-xl text-center text-white max-w-lg">
+      <h1 class="text-4xl font-bold mb-4">Welcome to Street Food Express</h1>
+      <p class="text-lg mb-6">
+        Freshly cooked street food favorites delivered right to your doorstep.
+      </p>
+      <a 
+        href="{% url 'menu:menu' %}"
+        class="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 rounded-lg text-lg font-semibold"
+      >
+        View Menu
+      </a>
+    </div>
+  </div>
+{% endblock %}

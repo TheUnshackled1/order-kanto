@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+  <h2>Admin Dashboard</h2>
+  <ul class="admin-list">
+    <li><a href="#">View Incoming Orders</a></li>
+    <li><a href="{% url 'sales_report' %}">Sales Reports</a></li>
+    <li><a href="#">Inventory Management</a></li>
+  </ul>
+</div>
+{% endblock %}

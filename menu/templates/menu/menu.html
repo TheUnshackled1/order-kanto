@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <div class="text-center mb-12">
+    <h1 class="text-4xl font-bold text-gray-900 mb-4">Our Menu</h1>
+    <p class="text-xl text-gray-600">Discover our delicious street food offerings</p>
+  </div>
+
+  {% if messages %}
+  <div class="messages mb-6">
+    {% for message in messages %}
+    <div class="p-4 mb-4 text-sm rounded-lg {% if message.tags == 'error' %}bg-red-100 text-red-700{% elif message.tags == 'success' %}bg-green-100 text-green-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if menu_items %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {% for item in menu_items %}
+      <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+        <!-- Item Image -->
+        <div class="h-48 bg-gray-200 overflow-hidden">
+          {% if item.image %}
+            <img class="menu-item-image" src="{{ item.image.url }}" alt="{{ item.name }}">
+          {% else %}
+            <div class="w-full h-full flex items-center justify-center">
+              <svg class="w-16 h-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z" />
+              </svg>
+            </div>
+          {% endif %}
+        </div>
+        
+        <!-- Item Details -->
+        <div class="p-6">
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="text-xl font-semibold text-gray-900">{{ item.name }}</h3>
+            <span class="text-2xl font-bold text-indigo-600">₱{{ item.price }}</span>
+          </div>
+          
+          <p class="text-gray-600 mb-4 line-clamp-3">{{ item.description }}</p>
+          
+          <!-- Add to Cart Section -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <label for="quantity-{{ item.id }}" class="text-sm font-medium text-gray-700">Quantity:</label>
+              <div class="flex items-center border rounded-lg">
+                <button onclick="changeQuantity({{ item.id }}, -1)" 
+                        class="px-3 py-1 text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-colors">
+                  -
+                </button>
+                <span id="quantity-{{ item.id }}" class="px-3 py-1 text-gray-900 font-medium">1</span>
+                <button onclick="changeQuantity({{ item.id }}, 1)" 
+                        class="px-3 py-1 text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-colors">
+                  +
+                </button>
+              </div>
+            </div>
+            
+            {% if user.is_authenticated %}
+              <button onclick="addToCart({{ item.id }})" 
+                      class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors">
+                Add to Cart
+              </button>
+            {% else %}
+              <a href="{% url 'customers:customer_login' %}" 
+                 class="w-full bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors text-center block">
+                Login to Order
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    
+    <!-- View Cart Button -->
+    {% if user.is_authenticated %}
+    <div class="text-center mt-12">
+      <a href="{% url 'customers:cart' %}" 
+         class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+        <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m6 0V9a2 2 0 00-2-2H9a2 2 0 002 2v4.01" />
+        </svg>
+        View Cart
+      </a>
+    </div>
+    {% endif %}
+  {% else %}
+    <div class="text-center py-12">
+      <div class="text-gray-400 mb-4">
+        <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">No menu items available</h3>
+      <p class="text-gray-500">Check back later for our delicious offerings!</p>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+// Quantity management
+function changeQuantity(itemId, change) {
+  const quantityElement = document.getElementById(`quantity-${itemId}`);
+  let currentQuantity = parseInt(quantityElement.textContent);
+  let newQuantity = currentQuantity + change;
+  
+  if (newQuantity < 1) {
+    newQuantity = 1;
+  }
+  
+  quantityElement.textContent = newQuantity;
+}
+
+// Add to cart functionality
+function addToCart(itemId) {
+  const quantityElement = document.getElementById(`quantity-${itemId}`);
+  const quantity = parseInt(quantityElement.textContent);
+  
+  const formData = new FormData();
+  formData.append('menu_item_id', itemId);
+  formData.append('quantity', quantity);
+  formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+  
+  fetch('/customers/add-to-cart/', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Show success message
+      showMessage(data.message, 'success');
+      // Reset quantity to 1
+      quantityElement.textContent = '1';
+    } else {
+      showMessage(data.message || 'Error adding item to cart', 'error');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    showMessage('Error adding item to cart', 'error');
+  });
+}
+
+// Show message function
+function showMessage(message, type) {
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+    type === 'success' ? 'bg-green-100 text-green-700' :
+    type === 'error' ? 'bg-red-100 text-red-700' :
+    'bg-blue-100 text-blue-700'
+  }`;
+  messageDiv.textContent = message;
+  
+  document.body.appendChild(messageDiv);
+  
+  setTimeout(() => {
+    messageDiv.remove();
+  }, 3000);
+}
+</script>
+
+<!-- Hidden CSRF token for JavaScript -->
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+<style>
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Added your custom image styles here */
+
+.menu-item-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+    display: block;
+    max-width: 100%;
+}
+
+.menu-item-image:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .menu-item-image {
+        height: 150px;
+    }
+}
+</style>
+{% endblock %}

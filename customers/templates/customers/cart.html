@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Your Cart</h1>
+    <div class="flex space-x-4">
+      <a href="{% url 'customers:order_history' %}" class="text-indigo-600 hover:text-indigo-500">Order History</a>
+      <a href="{% url 'customers:customer_logout' %}" class="text-red-600 hover:text-red-500">Logout</a>
+    </div>
+  </div>
+
+  {% if messages %}
+  <div class="messages mb-6">
+    {% for message in messages %}
+    <div class="p-4 mb-4 text-sm rounded-lg {% if message.tags == 'error' %}bg-red-100 text-red-700{% elif message.tags == 'success' %}bg-green-100 text-green-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if cart_items %}
+    <div class="bg-white shadow overflow-hidden sm:rounded-md">
+      <ul class="divide-y divide-gray-200">
+        {% for item in cart_items %}
+        <li class="px-6 py-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <div class="flex-shrink-0 h-16 w-16">
+                {% if item.menu_item.image %}
+                <img class="h-16 w-16 rounded-lg object-cover" src="{{ item.menu_item.image.url }}" alt="{{ item.menu_item.name }}">
+                {% else %}
+                <div class="h-16 w-16 rounded-lg bg-gray-200 flex items-center justify-center">
+                  <span class="text-gray-500 text-xs">No Image</span>
+                </div>
+                {% endif %}
+              </div>
+              <div class="ml-4">
+                <div class="text-sm font-medium text-gray-900">{{ item.menu_item.name }}</div>
+                <div class="text-sm text-gray-500">₱{{ item.menu_item.price }} each</div>
+              </div>
+            </div>
+            <div class="flex items-center space-x-4">
+              <div class="flex items-center border rounded-lg">
+                <button onclick="updateQuantity({{ item.id }}, -1)" class="px-3 py-1 text-gray-600 hover:text-gray-800">-</button>
+                <span class="px-3 py-1 text-gray-900 font-medium">{{ item.quantity }}</span>
+                <button onclick="updateQuantity({{ item.id }}, 1)" class="px-3 py-1 text-gray-600 hover:text-gray-800">+</button>
+              </div>
+              <div class="text-right">
+                <div class="text-sm font-medium text-gray-900">₱{{ item.total_price }}</div>
+                <button onclick="removeItem({{ item.id }})" class="text-red-600 hover:text-red-800 text-sm">Remove</button>
+              </div>
+            </div>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="mt-8 bg-white shadow sm:rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <div class="flex justify-between items-center">
+          <div>
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Order Summary</h3>
+            <p class="mt-1 text-sm text-gray-500">Review your order before checkout</p>
+          </div>
+          <div class="text-right">
+            <div class="text-2xl font-bold text-gray-900">₱{{ total_price }}</div>
+            <div class="text-sm text-gray-500">Total Amount</div>
+          </div>
+        </div>
+        
+        <div class="mt-6">
+          <a href="{% url 'customers:checkout' %}" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Proceed to Checkout
+          </a>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <div class="text-center py-12">
+      <div class="text-gray-400 mb-4">
+        <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m6 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">Your cart is empty</h3>
+      <p class="text-gray-500 mb-6">Start adding some delicious items to your cart!</p>
+      <a href="{% url 'menu:menu' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+        Browse Menu
+      </a>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+function updateQuantity(itemId, change) {
+  const formData = new FormData();
+  formData.append('quantity', change);
+  formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+  
+  fetch(`/customers/update-cart-item/${itemId}/`, {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      location.reload();
+    } else {
+      alert(data.message || 'Error updating cart');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Error updating cart');
+  });
+}
+
+function removeItem(itemId) {
+  if (confirm('Are you sure you want to remove this item?')) {
+    const formData = new FormData();
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+    
+    fetch(`/customers/remove-from-cart/${itemId}/`, {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert(data.message || 'Error removing item');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error removing item');
+    });
+  }
+}
+</script>
+{% endblock %} 

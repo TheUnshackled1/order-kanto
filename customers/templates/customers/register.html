@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full space-y-8">
+    <div>
+      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        Create your account
+      </h2>
+      <p class="mt-2 text-center text-sm text-gray-600">
+        Join OrderKanto and start ordering delicious food!
+      </p>
+    </div>
+    
+    {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+      <div class="p-4 mb-4 text-sm rounded-lg {% if message.tags == 'error' %}bg-red-100 text-red-700{% elif message.tags == 'success' %}bg-green-100 text-green-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    
+    <form class="mt-8 space-y-6" method="post">
+      {% csrf_token %}
+      
+      <div class="rounded-md shadow-sm -space-y-px">
+        <div class="mb-4">
+          <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700">Username</label>
+          {{ form.username }}
+          {% if form.username.errors %}
+          <div class="text-red-600 text-sm mt-1">{{ form.username.errors.0 }}</div>
+          {% endif %}
+        </div>
+        
+        <div class="mb-4">
+          <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700">Full Name</label>
+          {{ form.name }}
+          {% if form.name.errors %}
+          <div class="text-red-600 text-sm mt-1">{{ form.name.errors.0 }}</div>
+          {% endif %}
+        </div>
+        
+        <div class="mb-4">
+          <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700">Password</label>
+          {{ form.password1 }}
+          {% if form.password1.errors %}
+          <div class="text-red-600 text-sm mt-1">{{ form.password1.errors.0 }}</div>
+          {% endif %}
+        </div>
+        
+        <div class="mb-4">
+          <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+          {{ form.password2 }}
+          {% if form.password2.errors %}
+          <div class="text-red-600 text-sm mt-1">{{ form.password2.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div>
+        <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          Create Account
+        </button>
+      </div>
+      
+      <div class="text-center">
+        <p class="text-sm text-gray-600">
+          Already have an account? 
+          <a href="{% url 'customers:customer_login' %}" class="font-medium text-indigo-600 hover:text-indigo-500">
+            Sign in here
+          </a>
+        </p>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  input, textarea {
+    @apply appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm;
+  }
+</style>
+{% endblock %}
