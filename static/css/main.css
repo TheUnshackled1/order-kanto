@@ -1,0 +1,62 @@
+/* Dark Mode Styles */
+body.dark-mode {
+    background: #121212;
+    color: #ffffff;
+}
+
+body.dark-mode header {
+    background: rgba(0, 0, 0, 0.85);
+    border-bottom: 1px solid #333;
+}
+
+body.dark-mode header h1 a {
+    color: #ffffff;
+}
+
+body.dark-mode nav a {
+    color: #ccc;
+}
+
+body.dark-mode nav a:hover,
+body.dark-mode nav a.active {
+    color: #4a8a85;
+}
+
+body.dark-mode .card {
+    background: rgba(0, 0, 0, 0.9);
+    box-shadow: 0 2px 6px rgb(255 255 255 / 0.1);
+}
+
+body.dark-mode button {
+    background: #4a8a85;
+    color: white;
+}
+
+body.dark-mode button:hover {
+    background: #3a6e6b;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        padding: 1rem;
+    }
+
+    header h1 {
+        margin-bottom: 1rem;
+    }
+
+    nav {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    nav a {
+        margin: 0.5rem 0;
+    }
+
+    main {
+        padding: 0.5rem;
+    }
+}
